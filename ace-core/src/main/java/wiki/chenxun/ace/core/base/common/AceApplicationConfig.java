@@ -2,6 +2,7 @@ package wiki.chenxun.ace.core.base.common;
 
 import lombok.Data;
 import wiki.chenxun.ace.core.base.annotations.ConfigBean;
+import wiki.chenxun.ace.core.base.logger.LoggerFactory;
 
 /**
  * @Description: Created by chenxun on 2017/4/21.
@@ -24,4 +25,11 @@ public class AceApplicationConfig {
     private String container;
 
     private String register;
+
+    private String logger;
+
+    public void setLogger(String logger) {
+        this.logger = logger;
+        LoggerFactory.setLoggerAdapter(logger);
+    }
 }

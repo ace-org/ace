@@ -30,7 +30,6 @@ public class PersonServiceImpl implements PersonService {
     public Person test(@RequestParam String name, @RequestParam int age) {
         ConfigBeanParser parser = DefaultConfig.INSTANCE.configBeanParser(AceLoggerConfig.class);
         AceLoggerConfig loggerConfig = new AceLoggerConfig();
-        loggerConfig.setLevel(age);
         parser.notifyObservers(loggerConfig);
         Person person = new Person();
         person.setAge(age);
