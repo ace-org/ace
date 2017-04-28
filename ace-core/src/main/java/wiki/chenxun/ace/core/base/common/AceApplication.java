@@ -7,6 +7,7 @@ import wiki.chenxun.ace.core.base.config.ConfigBeanAware;
 import wiki.chenxun.ace.core.base.config.DefaultConfig;
 import wiki.chenxun.ace.core.base.container.Container;
 import wiki.chenxun.ace.core.base.register.Register;
+import wiki.chenxun.ace.core.base.register.RegisterConfig;
 import wiki.chenxun.ace.core.base.remote.Server;
 import wiki.chenxun.ace.core.base.support.ScanUtil;
 
@@ -142,8 +143,8 @@ public class AceApplication implements ConfigBeanAware<AceApplicationConfig> {
                 }
             }
         }
-//        register = ExtendLoader.getExtendLoader(Register.class).getExtension(aceApplicationConfig.getRegister());
-//        register.setConfigBean((RegisterConfig) config.configBeanParser(RegisterConfig.class).getConfigBean());
+        register = ExtendLoader.getExtendLoader(Register.class).getExtension(aceApplicationConfig.getRegister());
+        register.setConfigBean((RegisterConfig) config.configBeanParser(RegisterConfig.class).getConfigBean());
         //TODO: 注册服务
     }
 
