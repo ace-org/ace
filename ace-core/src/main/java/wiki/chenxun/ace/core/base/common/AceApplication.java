@@ -130,6 +130,7 @@ public class AceApplication implements ConfigBeanAware<AceApplicationConfig> {
 
 
     public void register(AceServiceBean... aceServiceBeans) {
+        config=DefaultConfig.INSTANCE;
         for (AceServiceBean aceServiceBean : aceServiceBeans) {
             Context.putAceServiceMap(aceServiceBean);
             Class cls = aceServiceBean.getInstance().getClass();
