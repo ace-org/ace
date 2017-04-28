@@ -24,7 +24,13 @@ public class ConfigBeanParser<T> extends Observable {
 
 
     public void parser(Class<T> t) {
-        ResourceBundle resource = ResourceBundle.getBundle(Config.DEFAULT_PATH);
+        ResourceBundle resource = null;
+        try {
+            resource = ResourceBundle.getBundle(Config.DEFAULT_PATH);
+        } catch (MissingResourceException ex) {
+            // TODO: application.properties 文件不存在
+        }
+
         ConfigBean configBean = (ConfigBean) t.getAnnotation(ConfigBean.class);
         String prefix = configBean.value();
         BeanInfo beanInfo = null;
@@ -34,7 +40,9 @@ public class ConfigBeanParser<T> extends Observable {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        //MissingResourceException
+        if (resource == null) {
+            return;
+        }
 
         PropertyDescriptor[] pds = beanInfo.getPropertyDescriptors();
         for (PropertyDescriptor propertyDescriptor : pds) {
