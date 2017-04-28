@@ -6,6 +6,8 @@ import wiki.chenxun.ace.core.base.logger.Logger;
 import wiki.chenxun.ace.core.base.logger.LoggerAdapter;
 import wiki.chenxun.ace.core.base.logger.LoggerLevel;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Observable;
 
 /**
@@ -15,9 +17,20 @@ public class LogbackAdapter implements LoggerAdapter {
 
     private AceLoggerConfig loggerConfig;
 
+    private final Map<String, Logger> loggerCache = new HashMap<>();
+
     @Override
     public Logger getLogger(String name) {
-        return new LogbackImpl(LoggerFactory.getLogger(name),this);
+        Logger logger = loggerCache.get(name);
+        if(logger == null){
+            synchronized (LogbackAdapter.class){
+                if(loggerCache.get(name) == null){
+                    loggerCache.put(name, new LogbackImpl(LoggerFactory.getLogger(name), this));
+                }
+            }
+            logger = loggerCache.get(name);
+        }
+        return logger;
     }
 
     @Override
@@ -35,13 +48,13 @@ public class LogbackAdapter implements LoggerAdapter {
         this.loggerConfig = (AceLoggerConfig) arg;
     }
 
-    public static class LogbackImpl implements Logger{
+    public static class LogbackImpl implements Logger {
 
         private org.slf4j.Logger logger;
 
         private LogbackAdapter logbackAdapter;
 
-        public LogbackImpl(org.slf4j.Logger logger,LogbackAdapter adapter){
+        public LogbackImpl(org.slf4j.Logger logger, LogbackAdapter adapter) {
             this.logger = logger;
             this.logbackAdapter = adapter;
         }
@@ -53,14 +66,14 @@ public class LogbackAdapter implements LoggerAdapter {
 
         @Override
         public void trace(String var1) {
-            if(isTraceEnabled()) {
+            if (isTraceEnabled()) {
                 logger.trace(var1);
             }
         }
 
         @Override
         public void trace(String var1, Object[] objects) {
-            if(isTraceEnabled()){
+            if (isTraceEnabled()) {
                 logger.trace(var1);
             }
         }
@@ -72,14 +85,14 @@ public class LogbackAdapter implements LoggerAdapter {
 
         @Override
         public void debug(String var1) {
-            if(isDebugEnabled()){
+            if (isDebugEnabled()) {
                 logger.debug(var1);
             }
         }
 
         @Override
         public void debug(String var1, Object[] objects) {
-            if(isDebugEnabled()){
+            if (isDebugEnabled()) {
                 logger.debug(var1);
             }
         }
@@ -91,14 +104,14 @@ public class LogbackAdapter implements LoggerAdapter {
 
         @Override
         public void info(String var1) {
-            if(isInfoEnabled()){
+            if (isInfoEnabled()) {
                 logger.info(var1);
             }
         }
 
         @Override
         public void info(String var1, Object[] objects) {
-            if(isInfoEnabled()){
+            if (isInfoEnabled()) {
                 logger.info(var1);
             }
         }
@@ -110,14 +123,14 @@ public class LogbackAdapter implements LoggerAdapter {
 
         @Override
         public void warn(String var1) {
-            if(isWarnEnabled()){
+            if (isWarnEnabled()) {
                 logger.warn(var1);
             }
         }
 
         @Override
         public void warn(String var1, Object[] objects) {
-            if(isWarnEnabled()){
+            if (isWarnEnabled()) {
                 logger.warn(var1);
             }
         }
@@ -129,14 +142,14 @@ public class LogbackAdapter implements LoggerAdapter {
 
         @Override
         public void error(String var1) {
-            if(isErrorEnabled()){
+            if (isErrorEnabled()) {
                 logger.error(var1);
             }
         }
 
         @Override
         public void error(String var1, Object[] objects) {
-            if(isErrorEnabled()){
+            if (isErrorEnabled()) {
                 logger.error(var1);
             }
         }

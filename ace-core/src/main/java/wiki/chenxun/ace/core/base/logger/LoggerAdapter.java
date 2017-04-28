@@ -7,7 +7,7 @@ import wiki.chenxun.ace.core.base.config.ConfigBeanAware;
 /**
  * Created by cookie on 2017/4/26.
  */
-@Spi("logback")
+@Spi("logger")
 public interface LoggerAdapter extends ConfigBeanAware<AceLoggerConfig> {
     Logger getLogger(String name);
     Logger getLogger(Class clz);

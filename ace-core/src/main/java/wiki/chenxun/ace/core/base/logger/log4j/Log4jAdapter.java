@@ -7,6 +7,7 @@ import wiki.chenxun.ace.core.base.logger.LoggerAdapter;
 import wiki.chenxun.ace.core.base.logger.LoggerLevel;
 
 import java.util.Observable;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by cookie on 2017/4/26.
@@ -15,10 +16,16 @@ public class Log4jAdapter implements LoggerAdapter {
 
     private AceLoggerConfig loggerConfig;
 
+    private ConcurrentHashMap<String, Logger> loggerCache = new ConcurrentHashMap<>();
 
     @Override
     public Logger getLogger(String name) {
-        return new Log4JImpl(LogManager.getLogger(name));
+        Logger logger = loggerCache.get(name);
+        if(logger == null){
+            loggerCache.put(name, new Log4JImpl(LogManager.getLogger(name)));
+            logger = loggerCache.get(name);
+        }
+        return logger;
     }
 
     @Override

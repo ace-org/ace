@@ -1,1 +1,1 @@
-logback=wiki.chenxun.ace.core.base.logger.logback.LogbackAdapter
+logger=wiki.chenxun.ace.core.base.logger.logback.LogbackAdapter
