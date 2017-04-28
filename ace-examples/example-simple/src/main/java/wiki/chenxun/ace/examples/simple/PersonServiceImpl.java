@@ -6,6 +6,11 @@ import wiki.chenxun.ace.core.base.annotations.AceService;
 import wiki.chenxun.ace.core.base.annotations.Get;
 import wiki.chenxun.ace.core.base.annotations.Post;
 import wiki.chenxun.ace.core.base.annotations.RequestParam;
+import wiki.chenxun.ace.core.base.common.AceLoggerConfig;
+import wiki.chenxun.ace.core.base.config.ConfigBeanParser;
+import wiki.chenxun.ace.core.base.config.DefaultConfig;
+import wiki.chenxun.ace.core.base.logger.Logger;
+import wiki.chenxun.ace.core.base.logger.LoggerFactory;
 
 /**
  * @Description: Created by chenxun on 2017/4/8.
@@ -23,6 +28,10 @@ public class PersonServiceImpl implements PersonService {
     @Post
     @Override
     public Person test(@RequestParam String name, @RequestParam int age) {
+        ConfigBeanParser parser = DefaultConfig.INSTANCE.configBeanParser(AceLoggerConfig.class);
+        AceLoggerConfig loggerConfig = new AceLoggerConfig();
+        loggerConfig.setLevel(age);
+        parser.notifyObservers(loggerConfig);
         Person person = new Person();
         person.setAge(age);
         person.setName(name);
@@ -32,7 +41,8 @@ public class PersonServiceImpl implements PersonService {
     @Get
     @Override
     public Person test2() {
-
+        Logger logger = LoggerFactory.getLogger("");
+        logger.info("test!");
         try {
             Thread.currentThread().sleep(15);
         } catch (InterruptedException e) {

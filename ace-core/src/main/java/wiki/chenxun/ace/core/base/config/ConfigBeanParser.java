@@ -65,7 +65,6 @@ public class ConfigBeanParser<T> extends Observable {
         }
     }
 
-
     /**
      * parse
      *
