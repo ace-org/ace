@@ -1,6 +1,9 @@
 package wiki.chenxun.ace.core.base.config;
 
 import wiki.chenxun.ace.core.base.annotations.ConfigBean;
+import wiki.chenxun.ace.core.base.exception.ApplicationException;
+import wiki.chenxun.ace.core.base.logger.Logger;
+import wiki.chenxun.ace.core.base.logger.LoggerFactory;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
@@ -28,9 +31,8 @@ public class ConfigBeanParser<T> extends Observable {
         try {
             resource = ResourceBundle.getBundle(Config.DEFAULT_PATH);
         } catch (MissingResourceException ex) {
-            // TODO: application.properties 文件不存在
-        }
 
+        }
         ConfigBean configBean = (ConfigBean) t.getAnnotation(ConfigBean.class);
         String prefix = configBean.value();
         BeanInfo beanInfo = null;
@@ -53,12 +55,8 @@ public class ConfigBeanParser<T> extends Observable {
                     String value = resource.getString(key);
                     Class paramClass = method.getParameterTypes()[0];
                     method.invoke(instance, parse(paramClass, value));
-                } catch (MissingResourceException e) {
-                    //TODO： 记录日志
-                } catch (IllegalAccessException e) {
-                    //TODO： 记录日志
-                } catch (InvocationTargetException e) {
-                    //TODO： 记录日志
+                } catch (MissingResourceException|IllegalAccessException|InvocationTargetException e) {
+                    new ApplicationException("config parse fail ",e);
                 }
             }
 

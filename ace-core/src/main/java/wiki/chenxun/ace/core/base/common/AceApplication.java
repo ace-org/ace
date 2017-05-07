@@ -6,6 +6,9 @@ import wiki.chenxun.ace.core.base.config.Config;
 import wiki.chenxun.ace.core.base.config.ConfigBeanAware;
 import wiki.chenxun.ace.core.base.config.DefaultConfig;
 import wiki.chenxun.ace.core.base.container.Container;
+import wiki.chenxun.ace.core.base.exception.ApplicationException;
+import wiki.chenxun.ace.core.base.logger.Logger;
+import wiki.chenxun.ace.core.base.logger.LoggerFactory;
 import wiki.chenxun.ace.core.base.register.Register;
 import wiki.chenxun.ace.core.base.register.RegisterConfig;
 import wiki.chenxun.ace.core.base.remote.Server;
@@ -35,49 +38,56 @@ public class AceApplication implements ConfigBeanAware<AceApplicationConfig> {
 
     private Register register;
 
+    private String[] mainArgs;
+
+    private final Logger logger = LoggerFactory.getLogger(AceApplication.class);
+
+    public AceApplication(){
+        config = DefaultConfig.INSTANCE;
+
+    }
+
     @Override
     public void setConfigBean(AceApplicationConfig aceApplicationConfig) {
         this.aceApplicationConfig = aceApplicationConfig;
     }
 
     public void scan() {
-        config = DefaultConfig.INSTANCE;
         if (aceApplicationConfig == null) {
             aceApplicationConfig = (AceApplicationConfig) config.configBeanParser(AceApplicationConfig.class).getConfigBean();
         }
         if (aceApplicationConfig.getName() == null && aceApplicationConfig.getName().trim().length() == 0) {
             throw new RuntimeException("ace.application.name must not empty ");
         }
-
+        logger.debug("start scan application form basePage :"+ basePage);
         Set<Class<?>> baseSet = ScanUtil.findFileClass(basePage);
         String[] packages = aceApplicationConfig.getPackages().split(",");
         //扫描
         Set<Class<?>> classSet = ScanUtil.findFileClass(packages);
         classSet.addAll(baseSet);
         for (Class cls : classSet) {
-            initAceServiceBean(cls);
+            try {
+                initAceServiceBean(cls);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+                return ;
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+                return ;
+            }
+
         }
         config.configBeanParser(AceApplicationConfig.class).addObserver(this);
         initContainer(packages);
     }
 
-    private void initAceServiceBean(Class cls) {
+    private void initAceServiceBean(Class cls) throws IllegalAccessException, InstantiationException {
         if (cls.isAnnotationPresent(AceService.class)) {
             AceServiceBean aceServiceBean = new AceServiceBean();
-            try {
                 aceServiceBean.setInstance(cls.newInstance());
                 AceService aceService = (AceService) cls.getAnnotation(AceService.class);
                 aceServiceBean.setPath(aceService.path());
                 register(aceServiceBean);
-
-            } catch (InstantiationException e) {
-                //TODO： 异常处理
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                //TODO： 异常处理
-                e.printStackTrace();
-            }
-
         }
 
     }
@@ -108,7 +118,7 @@ public class AceApplication implements ConfigBeanAware<AceApplicationConfig> {
             try {
                 bean = container.getBean(cls);
             } catch (Exception ex) {
-
+                logger.warn("container not find bean :"+cls );
             }
             if (bean != null) {
                 aceServiceBean.setInstance(bean);
@@ -122,6 +132,14 @@ public class AceApplication implements ConfigBeanAware<AceApplicationConfig> {
     @Override
     public void update(Observable o, Object arg) {
 
+    }
+
+    public String[] getMainArgs() {
+        return mainArgs;
+    }
+
+    public void setMainArgs(String[] mainArgs) {
+        this.mainArgs = mainArgs;
     }
 
     public enum Event {
@@ -138,8 +156,7 @@ public class AceApplication implements ConfigBeanAware<AceApplicationConfig> {
                 try {
                     initAceServiceMethod(cls, method);
                 } catch (IOException e) {
-                    //TODO: 异常处理
-                    e.printStackTrace();
+                    throw  new ApplicationException("ace service init fail ",e);
                 }
             }
         }
@@ -159,7 +176,7 @@ public class AceApplication implements ConfigBeanAware<AceApplicationConfig> {
                 try {
                     server.start();
                 } catch (Exception e) {
-                    // TODO:异常
+                    e.printStackTrace();
                 }
             }
         });
@@ -179,7 +196,7 @@ public class AceApplication implements ConfigBeanAware<AceApplicationConfig> {
                     container.stop();
                     config.clean();
                     state = 1;
-                    System.out.println("shutdown !!!");
+                    logger.info("aceApplication shutdown ");
                     AceApplication.class.notifyAll();
                 }
             }
@@ -195,7 +212,6 @@ public class AceApplication implements ConfigBeanAware<AceApplicationConfig> {
             }
         }
 
-        //TODO:结束
     }
 
 

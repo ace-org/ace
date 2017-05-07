@@ -15,6 +15,8 @@ import wiki.chenxun.ace.core.base.common.ExtendLoader;
 import wiki.chenxun.ace.core.base.config.ConfigBeanAware;
 import wiki.chenxun.ace.core.base.config.ConfigBeanParser;
 import wiki.chenxun.ace.core.base.config.DefaultConfig;
+import wiki.chenxun.ace.core.base.logger.Logger;
+import wiki.chenxun.ace.core.base.logger.LoggerFactory;
 import wiki.chenxun.ace.core.base.remote.Dispatcher;
 
 import java.util.Observable;
@@ -37,6 +39,8 @@ public class HttpServerInboundHandler extends ChannelInboundHandlerAdapter imple
     private Dispatcher dispatcher;
 
     private AceApplicationConfig aceApplicationConfig;
+
+    private final Logger logger= LoggerFactory.getLogger(HttpServerInboundHandler.class);
 
     /**
      * http协议header属性
@@ -85,8 +89,6 @@ public class HttpServerInboundHandler extends ChannelInboundHandlerAdapter imple
             }
             ObjectMapper om = new ObjectMapper();
             String jsonStr = om.writer().writeValueAsString(response);
-
-
             sendResponse(ctx, request, jsonStr);
         }
 
@@ -116,8 +118,7 @@ public class HttpServerInboundHandler extends ChannelInboundHandlerAdapter imple
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        // FIXME: 开发调试
-        // System.err.println(cause.getMessage());
+        logger.error(cause.getMessage());
         super.exceptionCaught(ctx, cause);
     }
 

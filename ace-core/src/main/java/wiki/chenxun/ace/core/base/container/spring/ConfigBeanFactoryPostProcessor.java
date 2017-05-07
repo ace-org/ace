@@ -5,6 +5,8 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import wiki.chenxun.ace.core.base.annotations.ConfigBean;
 import wiki.chenxun.ace.core.base.config.Config;
+import wiki.chenxun.ace.core.base.logger.Logger;
+import wiki.chenxun.ace.core.base.logger.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.util.Iterator;
@@ -15,6 +17,8 @@ import java.util.Iterator;
 public class ConfigBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
     private final Config config;
+
+    private final Logger logger= LoggerFactory.getLogger(ConfigBeanFactoryPostProcessor.class);
 
     public ConfigBeanFactoryPostProcessor(Config config) {
         this.config = config;

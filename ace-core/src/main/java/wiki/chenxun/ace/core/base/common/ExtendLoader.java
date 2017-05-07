@@ -8,6 +8,8 @@ import wiki.chenxun.ace.core.base.config.ConfigBeanParser;
 import wiki.chenxun.ace.core.base.config.DefaultConfig;
 
 import wiki.chenxun.ace.core.base.exception.ExtendLoadException;
+import wiki.chenxun.ace.core.base.logger.Logger;
+import wiki.chenxun.ace.core.base.logger.LoggerFactory;
 
 import java.beans.IntrospectionException;
 import java.io.BufferedReader;
@@ -61,6 +63,8 @@ public final class ExtendLoader<T> {
      * 扩展点类型
      */
     private Class type;
+
+    private static final Logger logger= LoggerFactory.getLogger(ExtendLoader.class);
 
     private ExtendLoader(Class type) {
         this.type = type;
@@ -191,16 +195,9 @@ public final class ExtendLoader<T> {
                         Method method = ConfigBeanAware.class.getMethod("setConfigBean",Object.class);
                         method.invoke(object, configBeanParser.getConfigBean());
                         configBeanParser.addObserver((Observer) object);
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (NoSuchMethodException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
+                    } catch (ClassNotFoundException|NoSuchMethodException|IllegalAccessException|InvocationTargetException e ) {
+                        throw new ExtendLoadException( "injectConfigBean fail ",e);
                     }
-
                 }
             }
         }
@@ -262,7 +259,7 @@ public final class ExtendLoader<T> {
             }
 
             if (t != null) {
-                label269:
+                loop:
                 while (t.hasMoreElements()) {
                     java.net.URL url = (java.net.URL) t.nextElement();
 
@@ -275,7 +272,7 @@ public final class ExtendLoader<T> {
                             while (true) {
                                 do {
                                     if ((line = t1.readLine()) == null) {
-                                        continue label269;
+                                        continue loop;
                                     }
 
                                     int ci = line.indexOf('#');
@@ -305,19 +302,19 @@ public final class ExtendLoader<T> {
 
                                     }
                                 } catch (Throwable th) {
-                                    //TODO: 异常处理
+                                    logger.error("loadFile fail and ex :"+th.getMessage());
                                 }
                             }
                         } finally {
                             t1.close();
                         }
                     } catch (Throwable th) {
-                        //TODO: 异常处理
+                        logger.error("loadFile fail and ex :"+th.getMessage());
                     }
                 }
             }
         } catch (Throwable th) {
-            //TODO: 异常处理
+            logger.error("loadFile fail and ex :"+th.getMessage());
         }
 
     }

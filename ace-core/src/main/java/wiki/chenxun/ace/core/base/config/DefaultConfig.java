@@ -12,6 +12,8 @@ import org.apache.zookeeper.data.Stat;
 import wiki.chenxun.ace.core.base.annotations.ConfigBean;
 import wiki.chenxun.ace.core.base.common.AceApplicationConfig;
 import wiki.chenxun.ace.core.base.common.AceServerConfig;
+import wiki.chenxun.ace.core.base.logger.Logger;
+import wiki.chenxun.ace.core.base.logger.LoggerFactory;
 import wiki.chenxun.ace.core.base.register.RegisterConfig;
 import wiki.chenxun.ace.core.base.support.InetAddressUtil;
 
@@ -32,8 +34,6 @@ public enum DefaultConfig implements Config {
     private Map<Class, ConfigBeanParser> configInstances = new ConcurrentHashMap<>();
 
     private volatile ZooKeeper zooKeeper;
-
-
 
     @Override
     public ConfigBeanParser configBeanParser(Class cls) {
@@ -80,8 +80,6 @@ public enum DefaultConfig implements Config {
                         byte[] data = om.writer().writeValueAsBytes(parser.getConfigBean());
                         zooKeeper.create(path + "/" + tmp, data, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
                     }
-
-
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (InterruptedException e) {

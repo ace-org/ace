@@ -19,7 +19,9 @@ public final class Main {
      */
     public static void main(String[] args) {
 
+
         AceApplication aceApplication = new AceApplication();
+        aceApplication.setMainArgs(args);
         aceApplication.scan();
         aceApplication.start();
         aceApplication.close();
